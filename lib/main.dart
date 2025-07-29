@@ -97,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       final lessonsJson = jsonEncode(lessons.map((lesson) => lesson.toJson()).toList());
       await HomeWidget.saveWidgetData<String>('lessons', lessonsJson);
-      await HomeWidget.updateWidget(name: 'HomeWidgetReceiver', androidName: 'HomeWidgetReceiver');
+      await HomeWidget.updateWidget(name: 'ScheduleWidgetReceiver');
     } catch (e) {
       debugPrint('Ошибка обновления виджета: $e');
     }

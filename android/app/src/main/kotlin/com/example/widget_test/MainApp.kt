@@ -9,6 +9,7 @@ class MainApp : Application() {
     override fun onCreate() {
         super.onCreate()
         Log.i("MainApp", "Запускаем цикл обновления виджетов")
-        WidgetAlarmScheduler.scheduleNextCycle(this)
+        // TODO: Uncomment the line below to schedule the next cycle
+    //    WidgetAlarmScheduler.scheduleNextCycle(this)
     }
 }

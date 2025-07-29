@@ -3,6 +3,5 @@
     android:minWidth="180dp"
     android:minHeight="90dp"
     android:updatePeriodMillis="0"
-    android:initialLayout="@layout/dummy"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen" />
