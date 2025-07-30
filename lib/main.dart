@@ -46,6 +46,20 @@ class Lesson {
   );
 }
 
+class LessonData {
+  final DateTime start;
+  final DateTime end;
+  final String subject;
+
+  LessonData({required this.start, required this.end, required this.subject});
+
+  Map<String, dynamic> toJson() => {
+    'start': start.toIso8601String(),
+    'end': end.toIso8601String(),
+    'subject': subject,
+  };
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -93,9 +107,26 @@ class _MyHomePageState extends State<MyHomePage> {
     await _updateWidget();
   }
 
+  DateTime _combineDateAndTime(DateTime date, TimeOfDay time) {
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+  }
+
   Future<void> _updateWidget() async {
     try {
-      final lessonsJson = jsonEncode(lessons.map((lesson) => lesson.toJson()).toList());
+      List<LessonData> data = [];
+      for (int i = 0; i < 50; i++) {
+        data.addAll(
+          lessons.map((lesson) {
+            final today = DateTime.now().add(Duration(days: i));
+            final start = _combineDateAndTime(today, lesson.start);
+            final end = _combineDateAndTime(today, lesson.end);
+
+            return LessonData(start: start, end: end, subject: lesson.subject);
+          }),
+        );
+      }
+
+      final lessonsJson = jsonEncode(data.map((lesson) => lesson.toJson()).toList());
       await HomeWidget.saveWidgetData<String>('lessons', lessonsJson);
       await HomeWidget.updateWidget(name: 'ScheduleWidgetReceiver');
     } catch (e) {
@@ -107,6 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_subjectController.text.isNotEmpty && _startTime != null && _endTime != null) {
       setState(() {
         lessons.add(Lesson(start: _startTime!, end: _endTime!, subject: _subjectController.text));
+        lessons.sort((a, b) => a.start.compareTo(b.start));
       });
       _subjectController.clear();
       _startTime = null;

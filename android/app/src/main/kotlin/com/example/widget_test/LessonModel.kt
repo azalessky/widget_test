@@ -1,14 +1,14 @@
 package com.example.widget_test
 
 import android.content.Context
+import android.util.Log
 import org.json.JSONArray
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
+import java.time.LocalDateTime
 
 data class Lesson(
     val subject: String,
-    val start: LocalTime,
-    val end: LocalTime
+    val start: LocalDateTime,
+    val end: LocalDateTime
 )
 
 enum class LessonStatus {
@@ -31,7 +31,7 @@ object LessonRepository {
         return lessons
     }
 
-    fun getLessonStatus(now: LocalTime): Pair<LessonStatus, Lesson?> {
+    fun getLessonStatus(now: LocalDateTime): Pair<LessonStatus, Lesson?> {
         for (lesson in lessons) {
             if (now.isAfter(lesson.start) && now.isBefore(lesson.end)) {
                 return LessonStatus.ACTIVE to lesson
@@ -45,20 +45,19 @@ object LessonRepository {
 }
 
 object LessonParser {
-    private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-
     fun parse(json: String): List<Lesson> {
         return try {
             val array = JSONArray(json)
             List(array.length()) { i ->
                 val obj = array.getJSONObject(i)
                 val subject = obj.getString("subject")
-                val start = LocalTime.parse(obj.getString("start"), timeFormatter)
-                val end = LocalTime.parse(obj.getString("end"), timeFormatter)
+                val start = LocalDateTime.parse(obj.getString("start"))
+                val end = LocalDateTime.parse(obj.getString("end"))
 
                 Lesson(subject, start, end)
             }
         } catch (e: Exception) {
+            Log.i("LessonParser", "Error parsing lessons: ${e.message}")
             emptyList()
         }
     }
