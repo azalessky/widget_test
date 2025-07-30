@@ -23,9 +23,8 @@ class ScheduleWidget : GlanceAppWidget() {
         get() = HomeWidgetGlanceStateDefinition()
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {        
-        val lessons = LessonRepository.getLessons()
-        val todayLessons = lessons.filter { it.start.toLocalDate() == LocalDate.now() }
-        provideContent { GlanceContent(todayLessons) }
+        val lessons = LessonRepository.getTodayLessons()
+        provideContent { GlanceContent(lessons) }
     }
 
     @Composable

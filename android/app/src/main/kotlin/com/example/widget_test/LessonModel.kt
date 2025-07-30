@@ -3,6 +3,7 @@ package com.example.widget_test
 import android.content.Context
 import android.util.Log
 import org.json.JSONArray
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class Lesson(
@@ -27,8 +28,8 @@ object LessonRepository {
         lessons = parsed.sortedBy { it.start }
     }
 
-    fun getLessons(): List<Lesson> {
-        return lessons
+    fun getTodayLessons(): List<Lesson> {
+        return lessons.filter { it.start.toLocalDate() == LocalDate.now() }
     }
 
     fun getLessonStatus(now: LocalDateTime): Pair<LessonStatus, Lesson?> {
