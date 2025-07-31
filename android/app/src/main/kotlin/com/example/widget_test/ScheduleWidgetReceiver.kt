@@ -16,9 +16,10 @@ class ScheduleWidgetReceiver : HomeWidgetGlanceWidgetReceiver<ScheduleWidget>() 
         if (intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE || 
             intent.action == Intent.ACTION_BOOT_COMPLETED
         ) {
-            Logger.i("ScheduleWidgetReceiver.onReceive()", "Schedule alarms")
+            Logger.i("ScheduleWidgetReceiver.onReceive()", "Update data/widget/alarms")
             
             LessonRepository.loadLessons(context)
+            ScheduleWidget().updateAll(context)
             AlarmPlanner.scheduleAlarms(context)
         }
     }

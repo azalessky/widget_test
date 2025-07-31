@@ -3,9 +3,9 @@ package com.example.widget_test
 import HomeWidgetGlanceStateDefinition
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.dp
 import androidx.glance.*
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.*
 import androidx.glance.state.GlanceStateDefinition
@@ -13,7 +13,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import java.time.Duration
 
 class ScheduleWidget : GlanceAppWidget() {
     override val stateDefinition: GlanceStateDefinition<*>
@@ -29,36 +28,29 @@ class ScheduleWidget : GlanceAppWidget() {
         val lessons = LessonRepository.getTodayLessons()
         val (status, lesson) = LessonRepository.getLessonStatus(now)
 
-        Logger.i("ScheduleWidget.GlanceContent()", "Updating widget, now = $now")
+        Logger.i("ScheduleWidget.GlanceContent()", "Update widget, now = $now")
         Logger.i("ScheduleWidget.GlanceContent()", "Display lessons, lessons = $lessons")
 
-        Column(modifier = GlanceModifier.fillMaxSize().padding(8.dp)) {
-            if (lessons.isEmpty()) {
-                EmptyPlaceholder()
-            } else {
-                when (status) {
-                    // TODO: Move text and time calculations to StatusBar
-                    LessonStatus.ACTIVE -> {
-                        val minsLeft = Duration.between(now, lesson!!.end).toMinutes()
-                        StatusBar("Идёт урок", minsLeft.toInt(), lesson)
-                    }
-                    LessonStatus.WAITING -> {
-                        val minsToStart = Duration.between(now, lesson!!.start).toMinutes()
-                        StatusBar("Следующий урок", minsToStart.toInt(), lesson)
-                    }
-                    LessonStatus.NONE -> {
-                        StatusBar("Нет уроков", null, null)
-                    }
-                }
+        Column {
+            if (lessons.isNotEmpty()) {
+                StatusBar(status, lesson)
                 LessonList(lessons)
+            } else {
+                EmptyPlaceholder()
             }
         }
     }
 
-     fun updateAll(context: Context) {
-         CoroutineScope(Dispatchers.Default).launch {
-             Logger.i("ScheduleWidget.updateAll()", "Update widgets")
-             ScheduleWidget().updateAll(context)
-         }
-     }
+   fun updateAll(context: Context) {
+        CoroutineScope(Dispatchers.Default).launch {
+            Logger.i("ScheduleWidget.updateAll()", "Update widgets")
+
+            val manager = GlanceAppWidgetManager(context)
+            val glanceIds = manager.getGlanceIds(ScheduleWidget::class.java)
+
+            glanceIds.forEach { glanceId ->
+                ScheduleWidget().update(context, glanceId)
+            }
+        }
+    }
 }
