@@ -2,14 +2,12 @@ package com.example.widget_test
 
 import android.app.Application
 import android.util.Log
-import android.os.Handler
-import android.os.Looper
 
 class MainApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        Log.i("MainApp", "Запускаем цикл обновления виджетов")
-        // TODO: Uncomment the line below to schedule the next cycle
-    //    WidgetAlarmScheduler.scheduleNextCycle(this)
+
+        Log.i("MainApp", "onCreate(): Schedule alarms")
+        AlarmPlanner.scheduleAlarms(this)
     }
 }

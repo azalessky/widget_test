@@ -5,31 +5,29 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.glance.*
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.*
 import androidx.glance.state.GlanceStateDefinition
-import androidx.glance.text.Text
-import androidx.glance.text.TextStyle
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.time.Duration
-import java.time.LocalDate
 
 class ScheduleWidget : GlanceAppWidget() {
     override val stateDefinition: GlanceStateDefinition<*>
         get() = HomeWidgetGlanceStateDefinition()
 
-    override suspend fun provideGlance(context: Context, id: GlanceId) {        
-        val lessons = LessonRepository.getTodayLessons()
-        provideContent { GlanceContent(lessons) }
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
+        provideContent { GlanceContent() }
     }
 
     @Composable
-    private fun GlanceContent(lessons: List<Lesson>) {  
+    private fun GlanceContent() {
         val now = LocalDateTime.now()
+        val lessons = LessonRepository.getTodayLessons()
         val (status, lesson) = LessonRepository.getLessonStatus(now)
 
         Log.i("ScheduleWidget", "Updating widget at: $now")
@@ -40,6 +38,7 @@ class ScheduleWidget : GlanceAppWidget() {
                 EmptyPlaceholder()
             } else {
                 when (status) {
+                    // TODO: Move text and time calculations to StatusBar
                     LessonStatus.ACTIVE -> {
                         val minsLeft = Duration.between(now, lesson!!.end).toMinutes()
                         StatusBar("Идёт урок", minsLeft.toInt(), lesson)
@@ -56,4 +55,11 @@ class ScheduleWidget : GlanceAppWidget() {
             }
         }
     }
+
+     fun updateAll(context: Context) {
+         CoroutineScope(Dispatchers.Default).launch {
+             Log.i("ScheduleWidget", "updateAll(): Update widgets")
+             ScheduleWidget().updateAll(context)
+         }
+     }
 }

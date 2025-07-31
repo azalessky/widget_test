@@ -6,29 +6,33 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 object AlarmScheduler {
     fun schedule(
         context: Context,
-        triggerTime: Long,
-        key: String,
+        time: LocalDateTime,
         callback: () -> Unit
     ) {
-        Log.i("AlarmScheduler", "Запланирован будильник для ключа: $key на время: $triggerTime")
+        val millis = time.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val key = "alarm_$millis"
+        val intent = createIntent(context, key)
 
         AlarmCallbackRegistry.register(key, callback)
-        val intent = createIntent(context, key)
-        scheduleIntent(context,triggerTime, intent)
+        scheduleIntent(context, millis, intent)
+
+        Log.i("AlarmScheduler", "schedule(): key = $key, time = $time")
     }
 
     fun cancelAll(context: Context) {
-        Log.i("AlarmScheduler", "Отмена всех будильников")
+        Log.i("AlarmScheduler", "cancelAll(): Cancel all alarms")
 
         for (key in AlarmCallbackRegistry.getKeys()) {
+            Log.i("AlarmScheduler", "cancelAll(): Cancel alarm, key = $key")
+
             val intent = createIntent(context, key)
             cancelIntent(context, intent)
-            
-            Log.i("AlarmScheduler", "Отменён будильник для ключа: $key")
         }
         AlarmCallbackRegistry.clear()
     }
@@ -53,7 +57,7 @@ object AlarmScheduler {
                 triggerTime,
                 intent)
         } catch (e: SecurityException) {
-            Log.e("AlarmScheduler", "Ошибка установки будильника: ${e.message}")
+            Log.e("AlarmScheduler", "scheduleIntent(): Failed to set alaram, error = ${e.message}")
         }  
     }
 
@@ -67,6 +71,8 @@ class AlarmCallbackReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val key = intent.getStringExtra("alarm_key") ?: return
         AlarmCallbackRegistry.trigger(key)
+
+        Log.i("AlarmCallbackReceiver", "onReceive(): Triggered alarm, key = $key")
     }
 }
 

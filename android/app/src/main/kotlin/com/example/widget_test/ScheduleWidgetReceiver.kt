@@ -12,17 +12,15 @@ class ScheduleWidgetReceiver : HomeWidgetGlanceWidgetReceiver<ScheduleWidget>() 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
 
-        Log.i("ScheduleWidgetReceiver", "Получено событие: ${intent.action}")
+        Log.i("ScheduleWidgetReceiver", "onReceive(): action = ${intent.action}")
 
-        if (intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE) {
-            Log.i("ScheduleWidgetReceiver", "APPWIDGET_UPDATE — загружаем уроки")
+        if (intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE || 
+            intent.action == Intent.ACTION_BOOT_COMPLETED
+        ) {
+            Log.i("ScheduleWidgetReceiver", "onReceive(): Set up alarms")
+            
             LessonRepository.loadLessons(context)
-        }
-  
-        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            Log.i("ScheduleWidgetReceiver", "BOOT_COMPLETED — переназначаем будильник")
-            // TODO: Uncomment the line below to schedule the next cycle
-           // AlarmPlanner.scheduleNextCycle(context)
+            AlarmPlanner.scheduleAlarms(context)
         }
     }
 }
