@@ -1,3 +1,5 @@
+package com.example.widget_test
+
 object AlarmCallbackRegistry {
     private val callbacks = mutableMapOf<String, () -> Unit>()
 

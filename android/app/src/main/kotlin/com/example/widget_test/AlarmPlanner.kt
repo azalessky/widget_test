@@ -23,12 +23,12 @@ object AlarmPlanner {
 
             AlarmScheduler.schedule(context, start) {
                 Logger.i("AlarmPlanner.scheduleLessons()", "Lesson started, subject = ${lesson.subject}")
-                ScheduleWidget().updateAll(context)
+                ScheduleWidget().updateWidgets(context)
             }
 
             AlarmScheduler.schedule(context, end) {
                 Logger.i("AlarmPlanner.scheduleLessons()", "Lesson finished, subject = ${lesson.subject}")
-                ScheduleWidget().updateAll(context)
+                ScheduleWidget().updateWidgets(context)
             }
         }
     }

@@ -19,7 +19,7 @@ class ScheduleWidgetReceiver : HomeWidgetGlanceWidgetReceiver<ScheduleWidget>() 
             Logger.i("ScheduleWidgetReceiver.onReceive()", "Update data/widget/alarms")
             
             LessonRepository.loadLessons(context)
-            ScheduleWidget().updateAll(context)
+            ScheduleWidget().updateWidgets(context)
             AlarmPlanner.scheduleAlarms(context)
         }
     }

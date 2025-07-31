@@ -5,8 +5,8 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.glance.*
 import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.provideContent
+import androidx.glance.appwidget.updateAll
 import androidx.glance.layout.*
 import androidx.glance.state.GlanceStateDefinition
 import kotlinx.coroutines.CoroutineScope
@@ -41,16 +41,10 @@ class ScheduleWidget : GlanceAppWidget() {
         }
     }
 
-   fun updateAll(context: Context) {
+   fun updateWidgets(context: Context) {
         CoroutineScope(Dispatchers.Default).launch {
-            Logger.i("ScheduleWidget.updateAll()", "Update widgets")
-
-            val manager = GlanceAppWidgetManager(context)
-            val glanceIds = manager.getGlanceIds(ScheduleWidget::class.java)
-
-            glanceIds.forEach { glanceId ->
-                ScheduleWidget().update(context, glanceId)
-            }
+            Logger.i("ScheduleWidget.updateWidgets()", "Update all instances")
+            ScheduleWidget().updateAll(context)
         }
     }
 }
