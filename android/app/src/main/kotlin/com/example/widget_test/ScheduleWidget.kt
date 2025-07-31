@@ -2,7 +2,6 @@ package com.example.widget_test
 
 import HomeWidgetGlanceStateDefinition
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.glance.*
@@ -30,8 +29,8 @@ class ScheduleWidget : GlanceAppWidget() {
         val lessons = LessonRepository.getTodayLessons()
         val (status, lesson) = LessonRepository.getLessonStatus(now)
 
-        Log.i("ScheduleWidget", "Updating widget at: $now")
-        Log.i("ScheduleWidget", "Displaying lessons: $lessons")
+        Logger.i("ScheduleWidget.GlanceContent()", "Updating widget, now = $now")
+        Logger.i("ScheduleWidget.GlanceContent()", "Display lessons, lessons = $lessons")
 
         Column(modifier = GlanceModifier.fillMaxSize().padding(8.dp)) {
             if (lessons.isEmpty()) {
@@ -58,7 +57,7 @@ class ScheduleWidget : GlanceAppWidget() {
 
      fun updateAll(context: Context) {
          CoroutineScope(Dispatchers.Default).launch {
-             Log.i("ScheduleWidget", "updateAll(): Update widgets")
+             Logger.i("ScheduleWidget.updateAll()", "Update widgets")
              ScheduleWidget().updateAll(context)
          }
      }

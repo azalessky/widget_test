@@ -4,7 +4,6 @@ import HomeWidgetGlanceWidgetReceiver
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 
 class ScheduleWidgetReceiver : HomeWidgetGlanceWidgetReceiver<ScheduleWidget>() {
     override val glanceAppWidget = ScheduleWidget()
@@ -12,12 +11,12 @@ class ScheduleWidgetReceiver : HomeWidgetGlanceWidgetReceiver<ScheduleWidget>() 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
 
-        Log.i("ScheduleWidgetReceiver", "onReceive(): action = ${intent.action}")
+        Logger.i("ScheduleWidgetReceiver.onReceive()", "action = ${intent.action}")
 
         if (intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE || 
             intent.action == Intent.ACTION_BOOT_COMPLETED
         ) {
-            Log.i("ScheduleWidgetReceiver", "onReceive(): Set up alarms")
+            Logger.i("ScheduleWidgetReceiver.onReceive()", "Schedule alarms")
             
             LessonRepository.loadLessons(context)
             AlarmPlanner.scheduleAlarms(context)

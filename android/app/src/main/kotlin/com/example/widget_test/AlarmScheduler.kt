@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -22,14 +21,14 @@ object AlarmScheduler {
         AlarmCallbackRegistry.register(key, callback)
         scheduleIntent(context, millis, intent)
 
-        Log.i("AlarmScheduler", "schedule(): key = $key, time = $time")
+        Logger.i("AlarmScheduler.schedule()", "Set alarm, key = $key, time = $time")
     }
 
     fun cancelAll(context: Context) {
-        Log.i("AlarmScheduler", "cancelAll(): Cancel all alarms")
+        Logger.i("AlarmScheduler.cancelAll()", "Cancel all alarms")
 
         for (key in AlarmCallbackRegistry.getKeys()) {
-            Log.i("AlarmScheduler", "cancelAll(): Cancel alarm, key = $key")
+            Logger.i("AlarmScheduler.cancelAll()", "Cancel alarm, key = $key")
 
             val intent = createIntent(context, key)
             cancelIntent(context, intent)
@@ -57,7 +56,7 @@ object AlarmScheduler {
                 triggerTime,
                 intent)
         } catch (e: SecurityException) {
-            Log.e("AlarmScheduler", "scheduleIntent(): Failed to set alaram, error = ${e.message}")
+            Logger.e("AlarmScheduler.scheduleIntent()", "Error setting alarm", e)
         }  
     }
 
@@ -72,7 +71,7 @@ class AlarmCallbackReceiver : BroadcastReceiver() {
         val key = intent.getStringExtra("alarm_key") ?: return
         AlarmCallbackRegistry.trigger(key)
 
-        Log.i("AlarmCallbackReceiver", "onReceive(): Triggered alarm, key = $key")
+        Logger.i("AlarmCallbackReceiver.onReceive()", "Trigger alarm, key = $key")
     }
 }
 

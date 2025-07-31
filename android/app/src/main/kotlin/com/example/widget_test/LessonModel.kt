@@ -1,7 +1,6 @@
 package com.example.widget_test
 
 import android.content.Context
-import android.util.Log
 import org.json.JSONArray
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -58,7 +57,7 @@ object LessonParser {
                 Lesson(subject, start, end)
             }
         } catch (e: Exception) {
-            Log.i("LessonParser", "Error parsing lessons: ${e.message}")
+            Logger.e("LessonParser.parse()", "Error parsing lessons", e)
             emptyList()
         }
     }
