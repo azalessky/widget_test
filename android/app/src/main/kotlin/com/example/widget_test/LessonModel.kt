@@ -39,7 +39,7 @@ object LessonRepository {
         val todayLessons = getTodayLessons()
 
         for ((index, lesson) in todayLessons.withIndex()) {
-            if (now.isAfter(lesson.start) && now.isBefore(lesson.end)) {
+            if (!now.isBefore(lesson.start) && now.isBefore(lesson.end)) {
                 return LessonStatus.ACTIVE to lesson
             }
             if (now.isBefore(lesson.start)) {

@@ -10,28 +10,8 @@ object AlarmPlanner {
         AlarmScheduler.cancelAll(context)
 
         val lessons = LessonRepository.getTodayLessons()
-    //    scheduleLessons(context, lessons)
         scheduleTicker(context, lessons)     
         scheduleReset(context)
-    }
-
-    private fun scheduleLessons(context: Context, lessons: List<Lesson>) {
-        for (lesson in lessons) {
-            val start = lesson.start
-            val end = lesson.end
-
-            Logger.i("AlarmPlanner.scheduleLessons()", "Plan alarms, subject = ${lesson.subject}, start = $start, end = $end")
-
-            AlarmScheduler.schedule(context, start) {
-                Logger.i("AlarmPlanner.scheduleLessons()", "Lesson started, subject = ${lesson.subject}")
-                ScheduleWidget().updateWidgets(context)
-            }
-
-            AlarmScheduler.schedule(context, end) {
-                Logger.i("AlarmPlanner.scheduleLessons()", "Lesson finished, subject = ${lesson.subject}")
-                ScheduleWidget().updateWidgets(context)
-            }
-        }
     }
 
     private fun scheduleTicker(context: Context, lessons: List<Lesson>) {
@@ -54,7 +34,7 @@ object AlarmPlanner {
             Logger.i("AlarmPlanner.startTicker()", "Ticker finished")
             return
         }
-        Logger.i("AlarmPlanner.startTicker()", "Ticker update at $current")
+        Logger.i("AlarmPlanner.startTicker()", "Ticker update, current = $current")
         
         AlarmScheduler.schedule(context, current) {
             ScheduleWidget().updateWidgets(context)
