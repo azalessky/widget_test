@@ -24,8 +24,6 @@ object AlarmScheduler {
     }
 
     fun cancelAll(context: Context) {
-        Logger.i("AlarmScheduler.cancelAll()", "Cancel all alarms")
-
         for (key in AlarmCallbackRegistry.getKeys()) {
             Logger.i("AlarmScheduler.cancelAll()", "Cancel alarm, key = $key")
 

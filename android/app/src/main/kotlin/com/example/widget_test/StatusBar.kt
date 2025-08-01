@@ -4,27 +4,50 @@ import androidx.compose.runtime.Composable
 import androidx.glance.text.Text
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun StatusBar(status: LessonStatus, lesson: Lesson?) {
     val now = LocalDateTime.now()
     val message: String
-    val minutes: Int?
+    val timeLabel: String?
 
     when (status) {
+        LessonStatus.UPCOMING -> {
+            message = "Начало уроков"
+            timeLabel = lesson?.start?.let {
+                val minutesLeft = Duration.between(now, it).toMinutes()
+                if (minutesLeft > 60)
+                    it.format(DateTimeFormatter.ofPattern("HH:mm"))
+                else
+                    formatTimeUntil(it, now)
+            }
+        }
         LessonStatus.ACTIVE -> {
             message = "Идёт урок"
-            minutes = lesson?.end?.let { Duration.between(now, it).toMinutes().toInt() }
+            timeLabel = lesson?.end?.let { formatTimeUntil(it, now) }
         }
         LessonStatus.WAITING -> {
             message = "Следующий урок"
-            minutes = lesson?.start?.let { Duration.between(now, it).toMinutes().toInt() }
+            timeLabel = lesson?.start?.let { formatTimeUntil(it, now) }
         }
-        LessonStatus.NONE -> {
-            message = "Нет уроков"
-            minutes = null
+        LessonStatus.DONE -> {
+            message = "Уроки закончены"
+            timeLabel = null
         }
     }
-    
-    Text("$message${minutes?.let { " • $it мин." } ?: ""}")
+    Text("$message${timeLabel?.let { " • $it" } ?: ""}")
+}
+
+fun formatTimeUntil(target: LocalDateTime, now: LocalDateTime): String {
+    val duration = Duration.between(now, target)
+    val totalMinutes = duration.toMinutes()
+    val hours = totalMinutes / 60
+    val minutes = totalMinutes % 60
+
+    return when {
+        hours == 0L -> "$minutes мин."
+        minutes == 0L -> "$hours ч"
+        else -> "$hours ч $minutes мин."
+    }
 }

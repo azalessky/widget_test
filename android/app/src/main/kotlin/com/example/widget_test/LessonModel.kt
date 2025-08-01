@@ -1,6 +1,7 @@
 package com.example.widget_test
 
 import android.content.Context
+import android.util.Log
 import org.json.JSONArray
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -12,9 +13,10 @@ data class Lesson(
 )
 
 enum class LessonStatus {
+    UPCOMING,
     ACTIVE,
     WAITING,
-    NONE
+    DONE
 }
 
 object LessonRepository {
@@ -24,23 +26,30 @@ object LessonRepository {
         val prefs = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
         val json = prefs.getString("lessons", null) ?: "[]"
         val parsed = LessonParser.parse(json)
+
         lessons = parsed.sortedBy { it.start }
+        Log.i("LessonRepository.loadLessons()", "lessons = ${lessons.size}")
     }
 
     fun getTodayLessons(): List<Lesson> {
         return lessons.filter { it.start.toLocalDate() == LocalDate.now() }
     }
 
-    fun getLessonStatus(now: LocalDateTime): Pair<LessonStatus, Lesson?> {
-        for (lesson in lessons) {
+   fun getLessonStatus(now: LocalDateTime): Pair<LessonStatus, Lesson?> {
+        val todayLessons = getTodayLessons()
+
+        for ((index, lesson) in todayLessons.withIndex()) {
             if (now.isAfter(lesson.start) && now.isBefore(lesson.end)) {
                 return LessonStatus.ACTIVE to lesson
             }
             if (now.isBefore(lesson.start)) {
-                return LessonStatus.WAITING to lesson
+                return if (index == 0)
+                    LessonStatus.UPCOMING to lesson
+                else
+                    LessonStatus.WAITING to lesson
             }
         }
-        return LessonStatus.NONE to null
+        return LessonStatus.DONE to null
     }
 }
 
