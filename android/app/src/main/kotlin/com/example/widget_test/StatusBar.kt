@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun StatusBar(status: LessonStatus, lesson: Lesson?) {
-    val now = LocalDateTime.now()
+    val now = LocalDateTime.now().stripSeconds()
     val message: String
     val timeLabel: String?
 

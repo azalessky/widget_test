@@ -60,5 +60,7 @@ dependencies {
     implementation("androidx.glance:glance:1.2.0-alpha01")
     implementation("androidx.glance:glance-appwidget:1.2.0-alpha01")
     implementation("androidx.glance:glance-material3:1.2.0-alpha01")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2") 
+    implementation("androidx.core:core-ktx:1.16.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+
 }

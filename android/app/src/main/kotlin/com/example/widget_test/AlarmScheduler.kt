@@ -5,7 +5,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 object AlarmScheduler {
     fun schedule(context: Context, time: LocalDateTime, callback: () -> Unit) {
@@ -13,14 +15,14 @@ object AlarmScheduler {
         val duration = Duration.between(now, time)
         if (duration.isNegative) return
 
-        val millis = System.currentTimeMillis() + duration.toMillis()
+        val millis = time.toEpochMillis()
         val key = "alarm_$millis"
         val intent = createIntent(context, key)
 
+        Logger.i("AlarmScheduler.schedule()", "Set alarm, key = $key, time = $time")
+        
         AlarmCallbackRegistry.register(key, callback)
         scheduleIntent(context, millis, intent)
-
-        Logger.i("AlarmScheduler.schedule()", "Set alarm, key = $key, time = $time millis = $millis")
     }
 
     fun cancelAll(context: Context) {
