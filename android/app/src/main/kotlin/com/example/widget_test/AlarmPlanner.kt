@@ -36,7 +36,7 @@ object AlarmPlanner {
         Logger.i("AlarmPlanner.startTicker()", "time = $current")
         
         AlarmScheduler.schedule(context, current) {
-            WidgetRefresher.requestUpdate(context,"ticker")
+            ScheduleWidget.updateAll(context)
             startTicker(context, current.plusMinutes(1), end)
         }
     }
@@ -47,7 +47,7 @@ object AlarmPlanner {
 
         AlarmScheduler.schedule(context, time) {
             Logger.i("AlarmPlanner.scheduleReset()", "Triggered alarms reset")
-            WidgetRefresher.requestUpdate(context,"reset")
+            ScheduleWidget.updateAll(context)
             scheduleAlarms(context)
         }
     }

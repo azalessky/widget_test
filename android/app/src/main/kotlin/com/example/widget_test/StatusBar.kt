@@ -1,13 +1,10 @@
 package com.example.widget_test
 
-import androidx.compose.runtime.Composable
-import androidx.glance.text.Text
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-@Composable
-fun StatusBar(status: LessonStatus, lesson: Lesson?) {
+fun getStatusText(status: LessonStatus, lesson: Lesson?): String {
     val now = LocalDateTime.now().stripSeconds()
     val message: String
     val timeLabel: String?
@@ -36,7 +33,8 @@ fun StatusBar(status: LessonStatus, lesson: Lesson?) {
             timeLabel = null
         }
     }
-    Text("$message${timeLabel?.let { " • $it" } ?: ""}")
+
+    return "$message${timeLabel?.let { " • $it" } ?: ""}"
 }
 
 fun formatTimeUntil(target: LocalDateTime, now: LocalDateTime): String {

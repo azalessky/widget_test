@@ -1,65 +1,42 @@
 package com.example.widget_test
 
-import HomeWidgetGlanceStateDefinition
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.sp
-import androidx.glance.*
-import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.appwidget.provideContent
-import androidx.glance.appwidget.state.getAppWidgetState
-import androidx.glance.layout.*
-import androidx.glance.state.GlanceStateDefinition
-import androidx.glance.text.Text
-import androidx.glance.text.TextStyle
-import kotlinx.coroutines.runBlocking
-import java.text.SimpleDateFormat
+import android.content.Intent
+import android.widget.RemoteViews
 import java.time.LocalDateTime
-import java.util.Date
-import java.util.Locale
 
-class ScheduleWidget : GlanceAppWidget() {
-    override val stateDefinition: GlanceStateDefinition<*>
-        get() = HomeWidgetGlanceStateDefinition()
-
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val prefs = getAppWidgetState(context, HomeWidgetGlanceStateDefinition(), id).preferences
-        val reason = prefs.getString("updateReason", null) ?: "unknown"
+object ScheduleWidget {
+    fun buildContent(context: Context): RemoteViews {
         val now = LocalDateTime.now().stripSeconds()
+        val (status, lesson) = LessonRepository.getLessonStatus(now)
 
-        provideContent { GlanceContent(now, reason) }
+        val statusText = getStatusText(status, lesson)
+
+        val views = RemoteViews(context.packageName, R.layout.schedule_widget)
+        views.setTextViewText(R.id.status_text, statusText)
+
+        val serviceIntent = Intent(context, LessonListService::class.java)
+        @Suppress("DEPRECATION")
+        views.setRemoteAdapter(R.id.lesson_list, serviceIntent)
+
+        return views
     }
 
-    @Composable
-    private fun GlanceContent(time: LocalDateTime, reason: String) {
-        val lessons = LessonRepository.getTodayLessons()
-        val (status, lesson) = LessonRepository.getLessonStatus(time)
+    fun updateAll(context: Context) {
+        Logger.i("ScheduleWidget.updateAll()", "Update all widgets")
+        
+        val manager = AppWidgetManager.getInstance(context)
+        val ids = manager.getAppWidgetIds(
+            ComponentName(context, ScheduleWidgetProvider::class.java)
+        )
 
-        Logger.i("ScheduleWidget.GlanceContent()", "Update widget, time = $time, reason = $reason")
-
-        val context = LocalContext.current
-        val glanceId = LocalGlanceId.current
-
-        val prefs = runBlocking {
-            getAppWidgetState(context, HomeWidgetGlanceStateDefinition(), glanceId)
-        }
-
-        val lastUpdated = prefs.preferences.getLong("lastUpdated", 0L)
-
-        val timestamp = if (lastUpdated > 0) {
-            SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(lastUpdated))
-        } else {
-            "never"
-        }
-
-        Column {
-            if (lessons.isNotEmpty()) {
-                Text(text = "Updated: $timestamp", style = TextStyle(fontSize = 12.sp))
-                StatusBar(status, lesson)
-                LessonList(lessons)
-            } else {
-                EmptyPlaceholder()
-            }
+        val views = buildContent(context)
+        ids.forEach { widgetId ->
+            manager.updateAppWidget(widgetId, views)
+            // TODO: Is this really needed?
+            manager.notifyAppWidgetViewDataChanged(widgetId, R.id.lesson_list)
         }
     }
 }

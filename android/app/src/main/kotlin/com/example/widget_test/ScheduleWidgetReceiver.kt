@@ -1,16 +1,12 @@
 package com.example.widget_test
 
-import HomeWidgetGlanceWidgetReceiver
 import android.appwidget.AppWidgetManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 
-class ScheduleWidgetReceiver : HomeWidgetGlanceWidgetReceiver<ScheduleWidget>() {
-    override val glanceAppWidget = ScheduleWidget()
-
+class ScheduleWidgetReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        super.onReceive(context, intent)
-
         Logger.i("ScheduleWidgetReceiver.onReceive()", "action = ${intent.action}")
 
         if (intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE || 
@@ -19,7 +15,7 @@ class ScheduleWidgetReceiver : HomeWidgetGlanceWidgetReceiver<ScheduleWidget>() 
             Logger.i("ScheduleWidgetReceiver.onReceive()", "Update data/widget/alarms")
             
             LessonRepository.loadLessons(context)
-            WidgetRefresher.requestUpdate(context,"data")
+            ScheduleWidget.updateAll(context)
             AlarmPlanner.scheduleAlarms(context)
         }
     }
