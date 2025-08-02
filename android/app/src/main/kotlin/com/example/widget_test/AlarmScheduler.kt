@@ -5,40 +5,39 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import java.time.Duration
-import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneId
 
 object AlarmScheduler {
-    fun schedule(context: Context, time: LocalDateTime, callback: () -> Unit) {
+    private val alarmKeys = mutableSetOf<String>()
+
+    fun schedule(context: Context, time: LocalDateTime, intent: Intent) {
         val now = LocalDateTime.now()
         val duration = Duration.between(now, time)
         if (duration.isNegative) return
 
         val millis = time.toEpochMillis()
-        val key = "alarm_$millis"
-        val intent = createIntent(context, key)
+        val key = intent.getStringExtra("alarm_key") ?: "undefined"
+        val pendingIntent = createIntent(context, key, intent)
 
-        Logger.i("AlarmScheduler.schedule()", "Set alarm, key = $key, time = $time")
+        Logger.i("AlarmScheduler.schedule()", "Set alarm $key at $time")
         
-        AlarmCallbackRegistry.register(key, callback)
-        scheduleIntent(context, millis, intent)
+        scheduleIntent(context, millis, pendingIntent)
+        alarmKeys.add(key)
     }
 
     fun cancelAll(context: Context) {
-        for (key in AlarmCallbackRegistry.getKeys()) {
-            Logger.i("AlarmScheduler.cancelAll()", "Cancel alarm, key = $key")
-
-            val intent = createIntent(context, key)
-            cancelIntent(context, intent)
+        for (key in alarmKeys) {
+            Logger.i("AlarmScheduler.cancelAll()", "Cancel alarm $key")
+            val intent = Intent(context, AlarmCallbackReceiver::class.java).apply {
+                putExtra("alarm_key", key)
+            }
+            val pendingIntent = createIntent(context, key, intent)
+            cancelIntent(context, pendingIntent)
         }
-        AlarmCallbackRegistry.clear()
+        alarmKeys.clear()
     }
 
-    private fun createIntent(context: Context, key: String): PendingIntent {
-        val intent = Intent(context, AlarmCallbackReceiver::class.java).apply {
-            putExtra("alarm_key", key)
-        }
+    private fun createIntent(context: Context, key: String, intent: Intent): PendingIntent {
         return PendingIntent.getBroadcast(
             context,
             key.hashCode(),

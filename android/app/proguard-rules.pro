@@ -1,0 +1,1 @@
+-keep class com.example.widget_test.Logger { *; }

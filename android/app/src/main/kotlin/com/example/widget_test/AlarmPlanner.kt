@@ -1,54 +1,69 @@
 package com.example.widget_test
 
 import android.content.Context
+import android.content.Intent
 import java.time.LocalDateTime
 
 object AlarmPlanner {
     fun scheduleAlarms(context: Context) {
-        Logger.i("AlarmPlanner.scheduleAlarms()", "Plan alarms for today")
-        AlarmScheduler.cancelAll(context)
+        Logger.i("AlarmPlanner.scheduleAlarms()", "Schedule alarms for today")
 
-        val lessons = LessonRepository.getTodayLessons()
-        scheduleTicker(context, lessons)     
+        AlarmScheduler.cancelAll(context)
+        scheduleTicker(context, LessonRepository.getTodayLessons())     
         scheduleReset(context)
     }
 
+    fun handleAlarm(context: Context, intent: Intent) {
+        val key = intent.getStringExtra("alarm_key") ?: return
+        Logger.i("AlarmPlanner.handleAlarm()", "Handle alarm $key") 
+
+        when {
+            key.startsWith("ticker") -> {
+                Logger.i("AlarmPlanner.handleAlarm()", "Ticker alarm triggered")
+                ScheduleWidget.updateAll(context)
+                scheduleTicker(context, LessonRepository.getTodayLessons())
+            }
+            key.startsWith("reset") -> {
+                Logger.i("AlarmPlanner.handleAlarm()", "Reset alarm triggered")
+                ScheduleWidget.updateAll(context)
+                scheduleAlarms(context)
+            }
+            else -> Logger.i("AlarmPlanner.handleAlarm()", "Unknown alarm $key")
+        } 
+    }
+
     private fun scheduleTicker(context: Context, lessons: List<Lesson>) {
-        if (lessons.isEmpty()) return
+        if (lessons.isEmpty()) 
+        {
+            Logger.i("AlarmPlanner.scheduleTicker()", "No lessons")
+            return
+        }
 
         val now = LocalDateTime.now().stripSeconds().plusMinutes(1)
         val start = lessons.first().start.minusHours(1)
         val end = lessons.last().end
-        val initial = if (now.isBefore(start)) start else now
+        val time = if (now < start) start else now
 
-        if (initial.isAfter(end)) {
-            Logger.i("AlarmPlanner.scheduleTicker()", "Skipped ticker")
-            return
-        }
-        startTicker(context, initial, end)
-    }
+        if (time <= end) {
+            Logger.i("AlarmPlanner.scheduleTicker()", "Schedule ticker at $time")
 
-    private fun startTicker(context: Context, current: LocalDateTime, end: LocalDateTime) {
-        if (current.isAfter(end)) {
-            Logger.i("AlarmPlanner.startTicker()", "Ticker finished")
-            return
+            val intent = Intent(context, AlarmCallbackReceiver::class.java).apply {
+                putExtra("alarm_key", "ticker_${time.toEpochMillis()}")
+            }
+            AlarmScheduler.schedule(context, time, intent)
         }
-        Logger.i("AlarmPlanner.startTicker()", "time = $current")
-        
-        AlarmScheduler.schedule(context, current) {
-            ScheduleWidget.updateAll(context)
-            startTicker(context, current.plusMinutes(1), end)
+        else {
+            Logger.i("AlarmPlanner.scheduleTicker()", "Finished ticker")
         }
     }
 
     private fun scheduleReset(context: Context) {
         val time = LocalDateTime.now().tomorrowMidnight()
-        Logger.i("AlarmPlanner.scheduleReset()", "Schedule alarms reset, time = $time")
+        Logger.i("AlarmPlanner.scheduleReset()", "Schedule alarms reset at $time")
 
-        AlarmScheduler.schedule(context, time) {
-            Logger.i("AlarmPlanner.scheduleReset()", "Triggered alarms reset")
-            ScheduleWidget.updateAll(context)
-            scheduleAlarms(context)
+        val intent = Intent(context, AlarmCallbackReceiver::class.java).apply {
+            putExtra("alarm_key", "reset_${time.toEpochMillis()}")
         }
+        AlarmScheduler.schedule(context, time, intent)
     }
 }

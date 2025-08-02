@@ -35,7 +35,7 @@ object ScheduleWidget {
         val views = buildContent(context)
         ids.forEach { widgetId ->
             manager.updateAppWidget(widgetId, views)
-            // TODO: Is this really needed?
+            @Suppress("DEPRECATION")
             manager.notifyAppWidgetViewDataChanged(widgetId, R.id.lesson_list)
         }
     }
