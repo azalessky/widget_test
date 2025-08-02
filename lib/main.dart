@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -147,6 +148,31 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> _addLessonAuto() async {
+    setState(() {
+      final now = TimeOfDay.now();
+      final startTime = TimeOfDay(hour: now.hour + 2, minute: 0);
+      final endTime = TimeOfDay(hour: startTime.hour, minute: 30);
+      final subject = String.fromCharCodes(
+        List.generate(5, (index) => 65 + Random().nextInt(26)), // Генерируем случайный предмет
+      );
+      lessons.add(Lesson(start: startTime, end: endTime, subject: subject));
+      lessons.sort((a, b) => a.start.compareTo(b.start));
+    });
+    await _saveLessons();
+  }
+
+  Future<void> _deleteAllLessons() async {
+    setState(() {
+      lessons.clear();
+      _startTime = null;
+      _endTime = null;
+    });
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('lessons');
+    await _updateWidget();
+  }
+
   Future<void> _selectTime(BuildContext context, bool isStart) async {
     final TimeOfDay? picked = await showTimePicker(context: context, initialTime: TimeOfDay.now());
     if (picked != null) {
@@ -194,6 +220,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             const SizedBox(height: 10),
             ElevatedButton(onPressed: _addLesson, child: const Text('Добавить урок')),
+            const SizedBox(height: 10),
+            ElevatedButton(onPressed: _addLessonAuto, child: const Text('Добавить урок (авто)')),
+            const SizedBox(height: 10),
+            ElevatedButton(onPressed: _deleteAllLessons, child: const Text('Удалить все уроки')),
             const SizedBox(height: 20),
             Expanded(
               child: ListView.builder(

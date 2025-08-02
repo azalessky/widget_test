@@ -1,7 +1,6 @@
 package com.example.widget_test
 
 import android.content.Context
-import android.util.Log
 import org.json.JSONArray
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -28,7 +27,7 @@ object LessonRepository {
         val parsed = LessonParser.parse(json)
 
         lessons = parsed.sortedBy { it.start }
-        Log.i("LessonRepository.loadLessons()", "lessons = ${lessons.size}")
+        Logger.i("LessonRepository.loadLessons()", "lessons = ${lessons.size}")
     }
 
     fun getTodayLessons(): List<Lesson> {

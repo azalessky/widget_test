@@ -1,8 +1,10 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.widget_test">
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <application
         android:label="widget_test"
+        android:name=".MainApp"
         android:icon="@mipmap/ic_launcher">
         <receiver
             android:name=".ScheduleWidgetReceiver"
