@@ -9,7 +9,7 @@ object AlarmPlanner {
         Logger.i("AlarmPlanner.scheduleAlarms()", "Schedule alarms for today")
 
         AlarmScheduler.cancelAll(context)
-        scheduleTicker(context, LessonRepository.getTodayLessons())     
+        scheduleTicker(context)     
         scheduleReset(context)
     }
 
@@ -21,7 +21,7 @@ object AlarmPlanner {
             key.startsWith("ticker") -> {
                 Logger.i("AlarmPlanner.handleAlarm()", "Ticker alarm triggered")
                 ScheduleWidget.updateAll(context)
-                scheduleTicker(context, LessonRepository.getTodayLessons())
+                scheduleTicker(context)
             }
             key.startsWith("reset") -> {
                 Logger.i("AlarmPlanner.handleAlarm()", "Reset alarm triggered")
@@ -32,7 +32,8 @@ object AlarmPlanner {
         } 
     }
 
-    private fun scheduleTicker(context: Context, lessons: List<Lesson>) {
+    private fun scheduleTicker(context: Context) {
+        val lessons = LessonRepository.getTodayLessons()
         if (lessons.isEmpty()) 
         {
             Logger.i("AlarmPlanner.scheduleTicker()", "No lessons")
