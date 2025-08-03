@@ -13,11 +13,7 @@
             if (action == Intent.ACTION_BOOT_COMPLETED ||
                 action == Intent.ACTION_USER_PRESENT
             ) {
-                Logger.i("ActionReceiver.onReceive()", "Received system action $action")
-
-                LessonRepository.loadLessons(context)
-                ScheduleWidget.updateAll(context)
-                AlarmPlanner.scheduleAlarms(context)
+                StateManager.updateState(context)
             }
         }
     }
