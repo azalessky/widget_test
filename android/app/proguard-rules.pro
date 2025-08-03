@@ -1,1 +1,2 @@
 -keep class com.example.widget_test.Logger { *; }
+-keep class com.example.widget_test.MainApp { *; }

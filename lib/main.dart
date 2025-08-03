@@ -129,7 +129,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
       final lessonsJson = jsonEncode(data.map((lesson) => lesson.toJson()).toList());
       await HomeWidget.saveWidgetData<String>('lessons', lessonsJson);
-      await HomeWidget.updateWidget(name: 'UpdateReceiver');
+      await HomeWidget.updateWidget(name: 'WidgetProvider');
+      debugPrint('Виджет обновлен с ${data.length} уроками');
     } catch (e) {
       debugPrint('Ошибка обновления виджета: $e');
     }

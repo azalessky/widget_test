@@ -10,7 +10,7 @@ class AlarmReceiver : BroadcastReceiver() {
         Logger.i("AlarmReceiver.onReceive()", "Alarm received at ${LocalDateTime.now()}")
         
         LessonRepository.loadLessons(context)
-        ScheduleWidget.updateAll(context)        
+        ScheduleWidget.updateAll(context) 
         AlarmPlanner.handleAlarm(context, intent)
     }
 }
