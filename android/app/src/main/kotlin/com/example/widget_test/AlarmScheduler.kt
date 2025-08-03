@@ -28,7 +28,7 @@ object AlarmScheduler {
     fun cancelAll(context: Context) {
         for (key in alarmKeys) {
             Logger.i("AlarmScheduler.cancelAll()", "Cancel alarm $key")
-            val intent = Intent(context, AlarmCallbackReceiver::class.java).apply {
+            val intent = Intent(context, AlarmReceiver::class.java).apply {
                 putExtra("alarm_key", key)
             }
             val pendingIntent = createIntent(context, key, intent)

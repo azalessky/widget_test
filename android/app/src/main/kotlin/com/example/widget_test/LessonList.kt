@@ -1,8 +1,15 @@
 package com.example.widget_test
 
 import android.content.Context
+import android.content.Intent
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+
+class LessonListService : RemoteViewsService() {
+    override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
+        return LessonListFactory(applicationContext)
+    }
+}
 
 class LessonListFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
     private var lessons: List<Lesson> = emptyList()

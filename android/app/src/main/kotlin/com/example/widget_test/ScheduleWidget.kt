@@ -29,7 +29,7 @@ object ScheduleWidget {
         
         val manager = AppWidgetManager.getInstance(context)
         val ids = manager.getAppWidgetIds(
-            ComponentName(context, ScheduleWidgetProvider::class.java)
+            ComponentName(context, WidgetProvider::class.java)
         )
 
         val views = buildContent(context)

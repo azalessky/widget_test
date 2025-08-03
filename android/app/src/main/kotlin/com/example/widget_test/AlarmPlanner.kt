@@ -20,12 +20,10 @@ object AlarmPlanner {
         when {
             key.startsWith("ticker") -> {
                 Logger.i("AlarmPlanner.handleAlarm()", "Ticker alarm triggered")
-                ScheduleWidget.updateAll(context)
                 scheduleTicker(context)
             }
             key.startsWith("reset") -> {
                 Logger.i("AlarmPlanner.handleAlarm()", "Reset alarm triggered")
-                ScheduleWidget.updateAll(context)
                 scheduleAlarms(context)
             }
             else -> Logger.i("AlarmPlanner.handleAlarm()", "Unknown alarm $key")
@@ -48,7 +46,7 @@ object AlarmPlanner {
         if (time <= end) {
             Logger.i("AlarmPlanner.scheduleTicker()", "Schedule ticker at $time")
 
-            val intent = Intent(context, AlarmCallbackReceiver::class.java).apply {
+            val intent = Intent(context, AlarmReceiver::class.java).apply {
                 putExtra("alarm_key", "ticker_${time.toEpochMillis()}")
             }
             AlarmScheduler.schedule(context, time, intent)
@@ -62,7 +60,7 @@ object AlarmPlanner {
         val time = LocalDateTime.now().tomorrowMidnight()
         Logger.i("AlarmPlanner.scheduleReset()", "Schedule alarms reset at $time")
 
-        val intent = Intent(context, AlarmCallbackReceiver::class.java).apply {
+        val intent = Intent(context, AlarmReceiver::class.java).apply {
             putExtra("alarm_key", "reset_${time.toEpochMillis()}")
         }
         AlarmScheduler.schedule(context, time, intent)

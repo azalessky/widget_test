@@ -129,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       final lessonsJson = jsonEncode(data.map((lesson) => lesson.toJson()).toList());
       await HomeWidget.saveWidgetData<String>('lessons', lessonsJson);
-      await HomeWidget.updateWidget(name: 'ScheduleWidgetReceiver');
+      await HomeWidget.updateWidget(name: 'UpdateReceiver');
     } catch (e) {
       debugPrint('Ошибка обновления виджета: $e');
     }
@@ -151,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _addLessonAuto() async {
     setState(() {
       final now = TimeOfDay.now();
-      final startTime = TimeOfDay(hour: now.hour + 2, minute: 0);
+      final startTime = TimeOfDay(hour: now.hour + Random().nextInt(3) + 1, minute: 0);
       final endTime = TimeOfDay(hour: startTime.hour, minute: 30);
       final subject = String.fromCharCodes(
         List.generate(5, (index) => 65 + Random().nextInt(26)), // Генерируем случайный предмет
