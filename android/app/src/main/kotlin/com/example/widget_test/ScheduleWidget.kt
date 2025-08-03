@@ -16,7 +16,7 @@ object ScheduleWidget {
         if (lessons.isEmpty()) {
             views.setViewVisibility(R.id.status_text, View.GONE)
             views.setViewVisibility(R.id.lesson_list, View.GONE)
-            
+
             views.setViewVisibility(R.id.empty_text, View.VISIBLE)
             views.setTextViewText(R.id.empty_text, "Нет уроков")
         } else {

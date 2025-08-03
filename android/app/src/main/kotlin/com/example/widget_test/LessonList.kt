@@ -31,8 +31,11 @@ class LessonListFactory(private val context: Context) : RemoteViewsService.Remot
     }
 
     override fun onDataSetChanged() {
-        lessons = LessonRepository.getTodayLessons()
-        Logger.i("LessonListFactory.onDataSetChanged()", "Updated lessons = ${lessons.size}")
+        val updated = LessonRepository.getTodayLessons()
+        if (updated != lessons) {
+            Logger.i("LessonListFactory.onDataSetChanged()", "Updated lessons ${lessons.size}->${updated.size}")
+            lessons = updated.toList()
+        }
     }
 
     override fun onCreate() {}

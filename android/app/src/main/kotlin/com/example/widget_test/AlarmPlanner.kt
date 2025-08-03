@@ -8,13 +8,15 @@ object AlarmPlanner {
     fun scheduleAlarms(context: Context) {
         Logger.i("AlarmPlanner.scheduleAlarms()", "Schedule alarms for today")
 
-        AlarmScheduler.cancelAll(context)
+        AlarmScheduler.clearAlarms(context)
         scheduleTicker(context)     
         scheduleReset(context)
     }
 
     fun handleAlarm(context: Context, intent: Intent) {
         val key = intent.getStringExtra("alarm_key") ?: return
+        AlarmScheduler.removeAlarm(key)
+
         Logger.i("AlarmPlanner.handleAlarm()", "Handle alarm $key") 
 
         when {
@@ -49,7 +51,7 @@ object AlarmPlanner {
             val intent = Intent(context, AlarmReceiver::class.java).apply {
                 putExtra("alarm_key", "ticker_${time.toEpochMillis()}")
             }
-            AlarmScheduler.schedule(context, time, intent)
+            AlarmScheduler.scheduleAlarm(context, time, intent)
         }
         else {
             Logger.i("AlarmPlanner.scheduleTicker()", "Finished ticker")
@@ -63,6 +65,6 @@ object AlarmPlanner {
         val intent = Intent(context, AlarmReceiver::class.java).apply {
             putExtra("alarm_key", "reset_${time.toEpochMillis()}")
         }
-        AlarmScheduler.schedule(context, time, intent)
+        AlarmScheduler.scheduleAlarm(context, time, intent)
     }
 }

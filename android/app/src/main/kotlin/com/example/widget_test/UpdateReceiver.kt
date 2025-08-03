@@ -8,7 +8,7 @@ import android.content.Intent
 class UpdateReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE) {
-            Logger.i("UpdateReceiver.onReceive()", "Restore state")
+            Logger.i("UpdateReceiver.onReceive()", "Update state")
 
             LessonRepository.loadLessons(context)
             ScheduleWidget.updateAll(context)

@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 object AlarmScheduler {
     private val alarms = mutableMapOf<String, LocalDateTime>()
 
-    fun schedule(context: Context, time: LocalDateTime, intent: Intent) {
+    fun scheduleAlarm(context: Context, time: LocalDateTime, intent: Intent) {
         val key = intent.getStringExtra("alarm_key") ?: "undefined"
         if (alarms.contains(key)) {
             Logger.i("AlarmScheduler.schedule()", "Alarm $key is already scheduled")
@@ -30,9 +30,18 @@ object AlarmScheduler {
         alarms[key] = time
     }
 
-    fun cancelAll(context: Context) {
+    fun removeAlarm(key: String) {
+        if (!alarms.containsKey(key)) {
+            Logger.i("AlarmScheduler.removeAlarm()", "No alarm found for $key")
+            return
+        }
+        Logger.i("AlarmScheduler.removeAlarm()", "Remove alarm $key")
+        alarms.remove(key)
+    }
+
+    fun clearAlarms(context: Context) {
         alarms.forEach { (key, time) ->
-            Logger.i("AlarmScheduler.cancelAll()", "Cancel alarm $key at $time")
+            Logger.i("AlarmScheduler.clearAlarms()", "Cancel alarm $key at $time")
 
             val intent = Intent(context, AlarmReceiver::class.java).apply {
                 putExtra("alarm_key", key)
@@ -41,8 +50,8 @@ object AlarmScheduler {
             cancelIntent(context, pendingIntent)
         }
         alarms.clear()
+        Logger.i("AlarmScheduler.clearAlarms()", "All alarms cancelled")      
     }
-
 
     private fun createIntent(context: Context, key: String, intent: Intent): PendingIntent {
         return PendingIntent.getBroadcast(
