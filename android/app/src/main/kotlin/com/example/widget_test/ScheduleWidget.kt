@@ -4,14 +4,18 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.RemoteViews
 import java.time.LocalDateTime
 
 object ScheduleWidget {
-    fun buildContent(context: Context): RemoteViews {
+    private fun buildContent(context: Context): RemoteViews {
         val lessons = LessonRepository.getTodayLessons()
         val views = RemoteViews(context.packageName, R.layout.schedule_widget)
+
+        Logger.i("ScheduleWidget.buildContent()", "Build widget with ${lessons.size} lessons")
 
         if (lessons.isEmpty()) {
             views.setViewVisibility(R.id.status_text, View.GONE)
@@ -49,7 +53,7 @@ object ScheduleWidget {
         ids.forEach { widgetId ->
             manager.updateAppWidget(widgetId, views)
             @Suppress("DEPRECATION")
-            manager.notifyAppWidgetViewDataChanged(widgetId, R.id.lesson_list)
+            manager.notifyAppWidgetViewDataChanged(widgetId, R.id.lesson_list)         
         }
     }
 }
