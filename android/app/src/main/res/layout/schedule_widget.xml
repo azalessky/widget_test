@@ -7,6 +7,14 @@
     android:padding="8dp"
     android:background="@android:color/white">
     <TextView
+        android:id="@+id/empty_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:visibility="gone"/>
+    <TextView
         android:id="@+id/status_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

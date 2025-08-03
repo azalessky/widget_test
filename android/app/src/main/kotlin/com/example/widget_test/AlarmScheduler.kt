@@ -8,34 +8,41 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 object AlarmScheduler {
-    private val alarmKeys = mutableSetOf<String>()
+    private val alarms = mutableMapOf<String, LocalDateTime>()
 
     fun schedule(context: Context, time: LocalDateTime, intent: Intent) {
+        val key = intent.getStringExtra("alarm_key") ?: "undefined"
+        if (alarms.contains(key)) {
+            Logger.i("AlarmScheduler.schedule()", "Alarm $key is already scheduled")
+            return
+        }
+
         val now = LocalDateTime.now()
         val duration = Duration.between(now, time)
         if (duration.isNegative) return
 
-        val millis = time.toEpochMillis()
-        val key = intent.getStringExtra("alarm_key") ?: "undefined"
-        val pendingIntent = createIntent(context, key, intent)
-
         Logger.i("AlarmScheduler.schedule()", "Set alarm $key at $time")
-        
+
+        val pendingIntent = createIntent(context, key, intent)
+        val millis = time.toEpochMillis()
+
         scheduleIntent(context, millis, pendingIntent)
-        alarmKeys.add(key)
+        alarms[key] = time
     }
 
     fun cancelAll(context: Context) {
-        for (key in alarmKeys) {
-            Logger.i("AlarmScheduler.cancelAll()", "Cancel alarm $key")
+        alarms.forEach { (key, time) ->
+            Logger.i("AlarmScheduler.cancelAll()", "Cancel alarm $key at $time")
+
             val intent = Intent(context, AlarmReceiver::class.java).apply {
                 putExtra("alarm_key", key)
             }
             val pendingIntent = createIntent(context, key, intent)
             cancelIntent(context, pendingIntent)
         }
-        alarmKeys.clear()
+        alarms.clear()
     }
+
 
     private fun createIntent(context: Context, key: String, intent: Intent): PendingIntent {
         return PendingIntent.getBroadcast(
