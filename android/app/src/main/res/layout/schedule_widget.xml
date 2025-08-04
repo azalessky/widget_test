@@ -16,8 +16,7 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:text="Нет уроков"
-        android:textSize="16sp"
-        android:textColor="@android:color/black"
+        android:textStyle="bold"        
         android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
         android:visibility="gone"/>
     <LinearLayout
@@ -49,10 +48,11 @@
     <ListView
         android:id="@+id/lesson_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:scrollbars="none"
         android:divider="@null"
-        android:dividerHeight="0dp" />
+        android:dividerHeight="0dp"
+        android:background="?attr/colorSurface" />
 </LinearLayout>
