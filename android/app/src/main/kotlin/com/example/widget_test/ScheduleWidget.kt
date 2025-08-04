@@ -18,19 +18,19 @@ object ScheduleWidget {
         val views = RemoteViews(context.packageName, R.layout.schedule_widget)
 
         if (lessons.isEmpty()) {
-            views.setViewVisibility(R.id.status_text, View.GONE)
+            views.setViewVisibility(R.id.status_container, View.GONE)
             views.setViewVisibility(R.id.lesson_list, View.GONE)
-
             views.setViewVisibility(R.id.empty_text, View.VISIBLE)
-            views.setTextViewText(R.id.empty_text, "Нет уроков")
         } else {
             val (status, lesson) = LessonRepository.getActiveLesson()
-            val statusText = getStatusText(status, lesson)
+            val (statusText, timeText) = formatStatusText(status, lesson)
 
             views.setTextViewText(R.id.status_text, statusText)
-            views.setViewVisibility(R.id.status_text, View.VISIBLE)
-            views.setViewVisibility(R.id.lesson_list, View.VISIBLE)
+            views.setTextViewText(R.id.time_text, timeText)
+
             views.setViewVisibility(R.id.empty_text, View.GONE)
+            views.setViewVisibility(R.id.status_container, View.VISIBLE)       
+            views.setViewVisibility(R.id.lesson_list, View.VISIBLE)
 
             if (status == LessonStatus.ACTIVE || status == LessonStatus.WAITING) {
                 val activeIndex = lessons.indexOf(lesson)

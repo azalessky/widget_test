@@ -71,3 +71,29 @@ object LessonParser {
         }
     }
 }
+
+fun formatStatusText(status: LessonStatus, lesson: Lesson?): Pair<String, String?> {
+    val statusText: String
+    val timeText: String?
+
+    when (status) {
+        LessonStatus.UPCOMING -> {
+            statusText = "Начало уроков"
+            timeText = lesson?.start?.formatTimeLeft(60)
+        }
+        LessonStatus.ACTIVE -> {
+            statusText = "Идёт урок"
+            timeText = lesson?.end?.formatTimeLeft()
+        }
+        LessonStatus.WAITING -> {
+            statusText = "Следующий урок"
+            timeText = lesson?.start?.formatTimeLeft(60)
+        }
+        LessonStatus.DONE -> {
+            statusText = "Уроки закончены"
+            timeText = null
+        }
+    }
+
+    return statusText to timeText
+}
