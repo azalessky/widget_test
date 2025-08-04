@@ -34,7 +34,8 @@ object LessonRepository {
         return lessons.filter { it.start.toLocalDate() == LocalDate.now() }
     }
 
-   fun getLessonStatus(now: LocalDateTime): Pair<LessonStatus, Lesson?> {
+   fun getActiveLesson(): Pair<LessonStatus, Lesson?> {
+        val now = LocalDateTime.now().stripSeconds()
         val todayLessons = getTodayLessons()
 
         for ((index, lesson) in todayLessons.withIndex()) {

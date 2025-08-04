@@ -4,7 +4,7 @@ plugins {
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose") version "2.2.20-Beta1"
+  //  id("org.jetbrains.kotlin.plugin.compose") version "2.2.20-Beta1"
 }
 
 android {
@@ -23,9 +23,9 @@ android {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
-    buildFeatures {
-        compose = true
-    }
+    // buildFeatures {
+    //     compose = true
+    // }
 
     composeOptions {
         //kotlinCompilerExtensionVersion = "1.8.3"
@@ -57,10 +57,7 @@ flutter {
 }
 
 dependencies {
-    implementation("androidx.glance:glance:1.2.0-alpha01")
-    implementation("androidx.glance:glance-appwidget:1.2.0-alpha01")
-    implementation("androidx.glance:glance-material3:1.2.0-alpha01")
     implementation("androidx.core:core-ktx:1.16.0")
+    implementation("com.google.android.material:material:1.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-
 }

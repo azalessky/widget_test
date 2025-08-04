@@ -44,8 +44,8 @@ fun formatTimeUntil(target: LocalDateTime, now: LocalDateTime): String {
     val minutes = totalMinutes % 60
 
     return when {
-        hours == 0L -> "$minutes мин."
+        hours == 0L -> "$minutes мин"
         minutes == 0L -> "$hours ч"
-        else -> "$hours ч $minutes мин."
+        else -> "$hours ч $minutes мин"
     }
 }

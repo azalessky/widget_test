@@ -4,8 +4,10 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.res.TypedArray
 import android.os.Handler
 import android.os.Looper
+import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.RemoteViews
 import java.time.LocalDateTime
@@ -15,8 +17,6 @@ object ScheduleWidget {
         val lessons = LessonRepository.getTodayLessons()
         val views = RemoteViews(context.packageName, R.layout.schedule_widget)
 
-        Logger.i("ScheduleWidget.buildContent()", "Build widget with ${lessons.size} lessons")
-
         if (lessons.isEmpty()) {
             views.setViewVisibility(R.id.status_text, View.GONE)
             views.setViewVisibility(R.id.lesson_list, View.GONE)
@@ -24,8 +24,7 @@ object ScheduleWidget {
             views.setViewVisibility(R.id.empty_text, View.VISIBLE)
             views.setTextViewText(R.id.empty_text, "Нет уроков")
         } else {
-            val now = LocalDateTime.now().stripSeconds()    
-            val (status, lesson) = LessonRepository.getLessonStatus(now)
+            val (status, lesson) = LessonRepository.getActiveLesson()
             val statusText = getStatusText(status, lesson)
 
             views.setTextViewText(R.id.status_text, statusText)
@@ -33,6 +32,11 @@ object ScheduleWidget {
             views.setViewVisibility(R.id.lesson_list, View.VISIBLE)
             views.setViewVisibility(R.id.empty_text, View.GONE)
 
+            if (status == LessonStatus.ACTIVE || status == LessonStatus.WAITING) {
+                val activeIndex = lessons.indexOf(lesson)
+                views.setScrollPosition(R.id.lesson_list, activeIndex)
+            }
+            
             val serviceIntent = Intent(context, LessonListService::class.java)
             @Suppress("DEPRECATION")
             views.setRemoteAdapter(R.id.lesson_list, serviceIntent)

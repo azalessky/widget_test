@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="8dp"
-    android:background="@android:color/white">
+    android:clipToOutline="true"
+    android:theme="@style/Theme.Material3.DynamicColors.DayNight"
+    android:background="@drawable/rounded_background">
     <TextView
         android:id="@+id/empty_text"
         android:layout_width="match_parent"
@@ -18,15 +21,17 @@
         android:id="@+id/status_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textColor="@android:color/black"
-        android:textStyle="bold"
         android:gravity="center"
-        android:paddingBottom="4dp" />
+        android:padding="12dp"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+        android:background="?attr/colorPrimaryContainer" />        
     <ListView
         android:id="@+id/lesson_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp" />
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:scrollbars="none"
+        android:divider="@null"
+        android:dividerHeight="0dp" />
 </LinearLayout>

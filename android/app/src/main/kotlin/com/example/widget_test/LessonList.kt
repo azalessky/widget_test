@@ -2,8 +2,10 @@ package com.example.widget_test
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import androidx.core.graphics.toColorInt
 
 class LessonListService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
@@ -27,6 +29,13 @@ class LessonListFactory(private val context: Context) : RemoteViewsService.Remot
         views.setTextViewText(R.id.time_text, "$start - $end")
         views.setTextViewText(R.id.subject_text, lesson.subject)
         
+        val (_, activeLesson) = LessonRepository.getActiveLesson()
+        if (activeLesson == lesson) {
+            views.setInt(R.id.root_layout, "setBackgroundColor", "#E0E0E0".toColorInt())
+        } else {
+            views.setInt(R.id.root_layout, "setBackgroundColor", Color.TRANSPARENT)
+        }
+
         return views
     }
 

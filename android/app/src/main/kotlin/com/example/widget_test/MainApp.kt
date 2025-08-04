@@ -12,19 +12,15 @@ class MainApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        val actions = listOf(
+            Intent.ACTION_BOOT_COMPLETED,
+            Intent.ACTION_USER_PRESENT
+        )
         val filter = IntentFilter().apply {
-            addAction(Intent.ACTION_BOOT_COMPLETED)
-            addAction(Intent.ACTION_USER_PRESENT)
+            actions.forEach { addAction(it) }
         }
         registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED)
-
-        val actions = buildList {
-            for (i in 0 until filter.countActions()) {
-                val action = filter.getAction(i)
-                val value = action.substringAfterLast('.') 
-                add(value)
-            }
-        }
+        
         Logger.i("MainApp.onCreate()", "Registered receiver for ${actions.joinToString(", ")}")
     }
 
