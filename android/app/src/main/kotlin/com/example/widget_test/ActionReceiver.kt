@@ -1,6 +1,5 @@
     package com.example.widget_test
 
-    import android.appwidget.AppWidgetManager
     import android.content.BroadcastReceiver
     import android.content.Context
     import android.content.Intent
@@ -10,10 +9,14 @@
             val action = intent?.action
             Logger.i("ActionReceiver.onReceive()", "Received action $action")
 
-            if (action == Intent.ACTION_BOOT_COMPLETED ||
-                action == Intent.ACTION_USER_PRESENT
-            ) {
-                StateManager.updateState(context)
+            when (action) {
+                Intent.ACTION_BOOT_COMPLETED,
+                Intent.ACTION_USER_PRESENT -> {
+                    StateManager.updateState(context)
+                }
+                Intent.ACTION_CONFIGURATION_CHANGED -> {
+                    ScheduleWidget.updateAll(context)
+                }
             }
         }
-    }
+}

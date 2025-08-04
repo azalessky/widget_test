@@ -3,8 +3,11 @@ package com.example.widget_test
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
+import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
+import androidx.annotation.AttrRes
+import androidx.core.content.ContextCompat
 
 object ScheduleWidget {
     fun updateAll(context: Context) {
@@ -25,34 +28,38 @@ object ScheduleWidget {
         val lessons = LessonRepository.getTodayLessons()
         val (status, lesson) = LessonRepository.getActiveLesson()
         val views = RemoteViews(context.packageName, R.layout.schedule_widget)
+        val hasLessons = lessons.isNotEmpty()
 
-        if (lessons.isEmpty()) {
-            views.setViewVisibility(R.id.status_container, View.GONE)
-            views.setViewVisibility(R.id.lesson_list, View.GONE)
-            views.setViewVisibility(R.id.empty_text, View.VISIBLE)
-        } else {
-            buildStatusBar(context, views, lesson, status)
+        if (hasLessons) {
+            buildStatusBar(views, lesson, status)
             buildLessonList(context, views, lesson, status, lessons)
-
-            views.setViewVisibility(R.id.empty_text, View.GONE)
-            views.setViewVisibility(R.id.status_container, View.VISIBLE)       
-            views.setViewVisibility(R.id.lesson_list, View.VISIBLE)
         }
+        showEmptyText(views, !hasLessons)
 
         return views
     }
 
-    private fun buildStatusBar(context: Context, views: RemoteViews, lesson: Lesson?, status: LessonStatus) {
-        val (statusText, timeText) = formatStatusText(status, lesson)
+    private fun showEmptyText(views: RemoteViews, show: Boolean) {
+        val showEmpty = if (show) View.VISIBLE else View.GONE
+        val showContent = if (show) View.GONE else View.VISIBLE
+
+        views.setViewVisibility(R.id.status_container, showContent)
+        views.setViewVisibility(R.id.lesson_list, showContent)
+        views.setViewVisibility(R.id.empty_text, showEmpty)
+    }
+
+    private fun buildStatusBar(views: RemoteViews, activeLesson: Lesson?, status: LessonStatus) {
+        val (statusText, timeText) = formatStatusText(status, activeLesson)
 
         views.setTextViewText(R.id.status_text, statusText)
         views.setTextViewText(R.id.time_text, timeText)
     }
 
-    private fun buildLessonList(context: Context, views: RemoteViews, lesson: Lesson?, status: LessonStatus, lessons: List<Lesson>) {
-        val builder = RemoteViews.RemoteCollectionItems.Builder() 
-        lessons.forEachIndexed { index, item ->
-            val itemViews = buildListItem(context, item, index + 1)
+    private fun buildLessonList(context: Context, views: RemoteViews, activeLesson: Lesson?, status: LessonStatus, lessons: List<Lesson>) {
+        val builder = RemoteViews.RemoteCollectionItems.Builder()
+        lessons.forEachIndexed { index, lesson ->
+            val selected = lesson == activeLesson && status == LessonStatus.ACTIVE
+            val itemViews = buildListItem(context, lesson, index + 1, selected)
             builder.addItem(index.toLong(), itemViews)
         }
 
@@ -60,12 +67,19 @@ object ScheduleWidget {
         views.setRemoteAdapter(R.id.lesson_list, items)
 
         if (status == LessonStatus.ACTIVE || status == LessonStatus.WAITING) {
-            val activeIndex = lessons.indexOf(lesson)
+            val activeIndex = lessons.indexOf(activeLesson)
             views.setScrollPosition(R.id.lesson_list, activeIndex)
         }
     }
 
-    private fun buildListItem(context: Context, lesson: Lesson, number: Int): RemoteViews {
+    fun resolveThemeColor(context: Context, @AttrRes attr: Int): Int {
+        val typedValue = TypedValue()
+        val theme = context.theme
+        theme.resolveAttribute(attr, typedValue, true)
+        return typedValue.data
+    }
+
+    private fun buildListItem(context: Context, lesson: Lesson, number: Int, selected: Boolean): RemoteViews {
         val start = lesson.start.formatTime()
         val end = lesson.end.formatTime()
 
@@ -74,6 +88,15 @@ object ScheduleWidget {
         views.setTextViewText(R.id.time_text, "$start - $end")
         views.setTextViewText(R.id.subject_text, lesson.subject)
 
-        return views
+        val colors = ColorsProvider(context)
+        val textColor = if (selected) colors.selectedItemText else colors.itemText
+        val bgColor = if (selected) colors.selectedItemBackground else colors.itemBackground
+        
+        views.setInt(R.id.item_container, "setBackgroundColor", bgColor)
+        views.setInt(R.id.number_text, "setTextColor", textColor)
+        views.setInt(R.id.time_text, "setTextColor", textColor)
+        views.setInt(R.id.subject_text, "setTextColor", textColor)
+
+        return views    
     }
 }

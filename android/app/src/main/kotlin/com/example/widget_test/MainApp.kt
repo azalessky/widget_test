@@ -14,7 +14,8 @@ class MainApp : Application() {
 
         val actions = listOf(
             Intent.ACTION_BOOT_COMPLETED,
-            Intent.ACTION_USER_PRESENT
+            Intent.ACTION_USER_PRESENT,
+            Intent.ACTION_CONFIGURATION_CHANGED
         )
         val filter = IntentFilter().apply {
             actions.forEach { addAction(it) }

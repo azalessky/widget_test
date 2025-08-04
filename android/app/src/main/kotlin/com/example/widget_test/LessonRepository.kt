@@ -15,7 +15,7 @@ enum class LessonStatus {
     UPCOMING,
     ACTIVE,
     WAITING,
-    DONE
+    COMPLETED
 }
 
 object LessonRepository {
@@ -49,7 +49,7 @@ object LessonRepository {
                     LessonStatus.WAITING to lesson
             }
         }
-        return LessonStatus.DONE to null
+        return LessonStatus.COMPLETED to null
     }
 }
 
@@ -89,7 +89,7 @@ fun formatStatusText(status: LessonStatus, lesson: Lesson?): Pair<String, String
             statusText = "Следующий урок"
             timeText = lesson?.start?.formatTimeLeft(60)
         }
-        LessonStatus.DONE -> {
+        LessonStatus.COMPLETED -> {
             statusText = "Уроки закончены"
             timeText = null
         }

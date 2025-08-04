@@ -5,6 +5,7 @@
     <application
         android:label="widget_test"
         android:name=".MainApp"
+        android:theme="@style/AppTheme"
         android:icon="@mipmap/ic_launcher">
         <receiver 
             android:name=".WidgetProvider"
@@ -15,7 +16,7 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/schedule_widget" />
-        </receiver>     
+        </receiver>
         <receiver
             android:name=".AlarmReceiver"
             android:exported="true"
