@@ -52,7 +52,7 @@ object ScheduleWidget {
     private fun buildLessonList(context: Context, views: RemoteViews, lesson: Lesson?, status: LessonStatus, lessons: List<Lesson>) {
         val builder = RemoteViews.RemoteCollectionItems.Builder() 
         lessons.forEachIndexed { index, item ->
-            val itemViews = buildListItem(context, item)
+            val itemViews = buildListItem(context, item, index + 1)
             builder.addItem(index.toLong(), itemViews)
         }
 
@@ -65,11 +65,12 @@ object ScheduleWidget {
         }
     }
 
-    private fun buildListItem(context: Context, lesson: Lesson): RemoteViews {
+    private fun buildListItem(context: Context, lesson: Lesson, number: Int): RemoteViews {
         val start = lesson.start.formatTime()
         val end = lesson.end.formatTime()
 
         val views = RemoteViews(context.packageName, R.layout.lesson_item)
+        views.setTextViewText(R.id.number_text, number.toString())      
         views.setTextViewText(R.id.time_text, "$start - $end")
         views.setTextViewText(R.id.subject_text, lesson.subject)
 

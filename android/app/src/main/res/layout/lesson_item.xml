@@ -9,6 +9,15 @@
     android:paddingTop="6dp"
     android:paddingBottom="6dp">
     <TextView
+        android:id="@+id/number_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingStart="12dp"
+        android:paddingEnd="20dp"
+        android:textAppearance="@style/TextAppearance.Material3.BodyLarge" 
+        android:textColor="?attr/colorOnSurface" />    
+    <TextView
         android:id="@+id/time_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
