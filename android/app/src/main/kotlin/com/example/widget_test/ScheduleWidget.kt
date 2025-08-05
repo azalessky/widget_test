@@ -3,6 +3,8 @@ package com.example.widget_test
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
@@ -20,7 +22,11 @@ object ScheduleWidget {
 
         val views = buildContent(context)
         ids.forEach { widgetId ->
-            manager.updateAppWidget(widgetId, views)
+            try {
+                manager.updateAppWidget(widgetId, views)
+            } catch (e: Exception) {
+                Logger.e("ScheduleWidget.updateAll()", "Cannot update widget", e)
+            }
         }
     }
 
@@ -72,13 +78,6 @@ object ScheduleWidget {
         }
     }
 
-    fun resolveThemeColor(context: Context, @AttrRes attr: Int): Int {
-        val typedValue = TypedValue()
-        val theme = context.theme
-        theme.resolveAttribute(attr, typedValue, true)
-        return typedValue.data
-    }
-
     private fun buildListItem(context: Context, lesson: Lesson, number: Int, selected: Boolean): RemoteViews {
         val start = lesson.start.formatTime()
         val end = lesson.end.formatTime()
@@ -91,7 +90,7 @@ object ScheduleWidget {
         val colors = ColorsProvider(context)
         val textColor = if (selected) colors.selectedItemText else colors.itemText
         val bgColor = if (selected) colors.selectedItemBackground else colors.itemBackground
-        
+
         views.setInt(R.id.item_container, "setBackgroundColor", bgColor)
         views.setInt(R.id.number_text, "setTextColor", textColor)
         views.setInt(R.id.time_text, "setTextColor", textColor)

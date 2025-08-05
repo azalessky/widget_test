@@ -9,7 +9,6 @@
     android:clipToOutline="true"
     android:theme="@style/Theme.Material3.DynamicColors.DayNight"
     android:background="@drawable/rounded_background">
-   
     <TextView
         android:id="@+id/empty_text"
         android:layout_width="match_parent"
@@ -23,27 +22,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingTop="12dp"
-        android:paddingBottom="12dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"               
-        android:background="?attr/colorPrimaryContainer">
+        android:background="?attr/colorSurfaceVariant">
         <TextView
             android:id="@+id/status_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="start"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="?attr/colorOnPrimaryContainer" />
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:textColor="?attr/colorOnSurfaceVariant" />
         <TextView
             android:id="@+id/time_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="end"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="?attr/colorOnPrimaryContainer" />
-    </LinearLayout>             
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+    </LinearLayout>
     <ListView
         android:id="@+id/lesson_list"
         android:layout_width="match_parent"
@@ -52,6 +51,5 @@
         android:paddingBottom="8dp"
         android:scrollbars="none"
         android:divider="@null"
-        android:dividerHeight="0dp"
-        android:background="?attr/colorSurface" />
+        android:dividerHeight="0dp"/>
 </LinearLayout>
