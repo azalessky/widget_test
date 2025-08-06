@@ -10,40 +10,27 @@
     android:theme="@style/Theme.Material3.DynamicColors.DayNight"
     android:background="@drawable/widget_background">
     <TextView
-        android:id="@+id/empty_text"
+        android:id="@+id/placeholder_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:text="Нет уроков"    
-        android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
         android:visibility="gone"/>
-    <LinearLayout
-        android:id="@+id/status_container"
+    <TextView
+        android:id="@+id/status_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"               
-        android:background="?attr/colorSurfaceVariant">
-        <TextView
-            android:id="@+id/status_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-            android:textColor="?attr/colorOnSurfaceVariant" />
-    </LinearLayout>
+        android:gravity="center"
+        android:padding="16dp"
+        android:background="?attr/colorPrimaryContainer"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+        android:textColor="?attr/colorOnPrimaryContainer" />
     <ListView
         android:id="@+id/lesson_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"      
+        android:padding="12dp"
         android:scrollbars="none"
         android:divider="@null"
         android:dividerHeight="0dp"/>

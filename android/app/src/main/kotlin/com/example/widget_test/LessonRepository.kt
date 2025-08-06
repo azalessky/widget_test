@@ -11,16 +11,17 @@ data class Lesson(
     val end: LocalDateTime
 )
 
-data class ActiveLesson(
-    val lesson: Lesson?,
-    val status: LessonStatus,
+data class ScheduleState(
+    val status: ScheduleStatus,
+    val lesson: Lesson?
 )
 
+enum class ScheduleStatus {
+    EMPTY, WAITING, RUNNING, BREAK, DONE
+}
+
 enum class LessonStatus {
-    UPCOMING,
-    ONGOING,
-    WAITING,
-    COMPLETED
+    PLANNED, ACTIVE, COMPLETED
 }
 
 object LessonRepository {
@@ -36,23 +37,45 @@ object LessonRepository {
     }
 
     fun getTodayLessons(): List<Lesson> {
-        return lessons.filter { it.start.toLocalDate() == LocalDate.now() }
+        return lessons.filter {
+            it.start.toLocalDate() == LocalDate.now()
+        }
     }
 
-   fun getActiveLesson(): ActiveLesson {
-        val now = LocalDateTime.now().stripSeconds()
-        val todayLessons = getTodayLessons()
+    fun getRemainingLessons(): List<Lesson> {
+        return getTodayLessons().filter {
+            getLessonStatus(it) != LessonStatus.COMPLETED
+        }
+    }
 
-        for ((index, lesson) in todayLessons.withIndex()) {
-            if (!now.isBefore(lesson.start) && now.isBefore(lesson.end)) {
-                return ActiveLesson(lesson, LessonStatus.ONGOING)
-            }
-            if (now.isBefore(lesson.start)) {
-                val status = if (index == 0) LessonStatus.UPCOMING else LessonStatus.WAITING
-                return ActiveLesson(lesson, status)
+    fun getLessonStatus(lesson: Lesson): LessonStatus {
+        val now = LocalDateTime.now().stripSeconds()
+        return if (now.isBefore(lesson.start)) {
+            LessonStatus.PLANNED
+        } else if (!now.isBefore(lesson.start) && now.isBefore(lesson.end)) {
+            LessonStatus.ACTIVE
+        } else {
+            LessonStatus.COMPLETED
+        }
+    }
+
+   fun getScheduleState(): ScheduleState {
+        val todayLessons = getTodayLessons()
+        if (todayLessons.isEmpty()) {
+            return ScheduleState(ScheduleStatus.EMPTY, null)
+        }
+
+        val state = todayLessons.withIndex().firstNotNullOfOrNull { (index, lesson) ->
+            when (getLessonStatus(lesson)) {
+                LessonStatus.ACTIVE -> ScheduleState(ScheduleStatus.RUNNING, lesson)
+                LessonStatus.PLANNED -> {
+                    val status = if (index == 0) ScheduleStatus.WAITING else ScheduleStatus.BREAK
+                    ScheduleState(status, lesson)
+                }
+                else -> null
             }
         }
-        return ActiveLesson(null, LessonStatus.COMPLETED)
+        return state ?: ScheduleState(ScheduleStatus.DONE, null)
     }
 }
 
@@ -75,12 +98,22 @@ object LessonParser {
     }
 }
 
-fun ActiveLesson.getStatusText(): String {
-    val (statusText, timeText) = when (status) {
-        LessonStatus.UPCOMING -> "Начало уроков" to lesson?.start?.formatTimeLeft(60)
-        LessonStatus.ONGOING -> "Идёт урок" to lesson?.end?.formatTimeLeft()
-        LessonStatus.WAITING -> "Следующий урок" to lesson?.start?.formatTimeLeft(60)
-        LessonStatus.COMPLETED -> "Уроки закончены" to null
+fun ScheduleState.getStatusText(): String {
+    val statusText = when (status) {
+        ScheduleStatus.EMPTY -> "Уроков нет"
+        ScheduleStatus.WAITING -> "Начало уроков"
+        ScheduleStatus.RUNNING -> "Идёт урок"
+        ScheduleStatus.BREAK -> "Следующий урок"
+        ScheduleStatus.DONE -> "Уроки закончены"
     }
+    val timeText = when (status) {
+        ScheduleStatus.EMPTY -> null
+        ScheduleStatus.WAITING -> lesson?.start?.formatTimeLeft(60)
+        ScheduleStatus.RUNNING -> lesson?.end?.formatTimeLeft()
+        ScheduleStatus.BREAK -> lesson?.start?.formatTimeLeft(60)
+        ScheduleStatus.DONE -> null
+    }
+
     return if (timeText != null) "$statusText • $timeText" else statusText
 }
+

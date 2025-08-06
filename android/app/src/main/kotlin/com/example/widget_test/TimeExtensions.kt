@@ -24,7 +24,7 @@ fun LocalDateTime.formatTimeLeft(minutesThreshold: Int = 0): String {
     val now = LocalDateTime.now().stripSeconds()
 
     val totalMinutes = Duration.between(now, this).toMinutes()
-    if (minutesThreshold > 0 && totalMinutes > minutesThreshold) {
+    if (minutesThreshold > 0 && totalMinutes >= minutesThreshold) {
         return formatTime()
     }
     

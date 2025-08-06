@@ -5,7 +5,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.view.View
 import android.widget.RemoteViews
-import java.time.LocalDateTime
 
 object ScheduleWidget {
     fun updateAll(context: Context) {
@@ -27,78 +26,84 @@ object ScheduleWidget {
     }
 
     private fun buildContent(context: Context): RemoteViews {
-        val lessons = LessonRepository.getTodayLessons()
-        val activeLesson = LessonRepository.getActiveLesson()
         val views = RemoteViews(context.packageName, R.layout.schedule_widget)
+        val lessons = LessonRepository.getRemainingLessons()
+        val schedule = LessonRepository.getScheduleState()
         val hasLessons = lessons.isNotEmpty()
 
         if (hasLessons) {
-            buildStatusBar(views, activeLesson)
-            buildLessonList(context, views, activeLesson, lessons)
+            buildStatusBar(views, schedule)
+            buildLessonList(context, views, schedule, lessons)
+        } else {
+            buildPlaceholder(views, schedule)
         }
-        showEmptyText(views, !hasLessons)
+        showDataContent(views, hasLessons)
 
         return views
     }
 
-    private fun showEmptyText(views: RemoteViews, show: Boolean) {
-        val showEmpty = if (show) View.VISIBLE else View.GONE
-        val showContent = if (show) View.GONE else View.VISIBLE
+    private fun showDataContent(views: RemoteViews, hasLessons: Boolean){
+        val showPlaceholder = if (hasLessons) View.GONE else View.VISIBLE
+        val showData = if (hasLessons) View.VISIBLE else View.GONE
 
-        views.setViewVisibility(R.id.status_container, showContent)
-        views.setViewVisibility(R.id.lesson_list, showContent)
-        views.setViewVisibility(R.id.empty_text, showEmpty)
+        views.setViewVisibility(R.id.placeholder_text, showPlaceholder)
+        views.setViewVisibility(R.id.status_text, showData)
+        views.setViewVisibility(R.id.lesson_list, showData)
     }
 
-    private fun buildStatusBar(views: RemoteViews, activeLesson: ActiveLesson) {
-        val text = activeLesson.getStatusText()
+    private fun buildPlaceholder(views: RemoteViews, schedule: ScheduleState) {
+        views.setTextViewText(R.id.placeholder_text, schedule.getStatusText())
+    }
+
+    private fun buildStatusBar(views: RemoteViews, schedule: ScheduleState) {
+        val text = schedule.getStatusText()
         views.setTextViewText(R.id.status_text, text)
     }
 
-    private fun buildLessonList(context: Context, views: RemoteViews, activeLesson: ActiveLesson, lessons: List<Lesson>) {
+    private fun buildLessonList(context: Context, views: RemoteViews, schedule: ScheduleState, lessons: List<Lesson>) {
         val builder = RemoteViews.RemoteCollectionItems.Builder()
+        var activeIndex: Int? = null
+
         lessons.forEachIndexed { index, lesson ->
-            val selected = lesson == activeLesson.lesson && activeLesson.status == LessonStatus.ONGOING
-            val itemViews = buildListItem(context, lesson, index + 1, selected)
-            builder.addItem(index.toLong(), itemViews)
+            val status = LessonRepository.getLessonStatus(lesson)
+            val view = buildListItem(context, lesson, status)
+            builder.addItem(index.toLong(), view)
+
+            if (lesson == schedule.lesson &&
+                schedule.status == ScheduleStatus.RUNNING ||
+                schedule.status == ScheduleStatus.WAITING) {
+                activeIndex = index
+            }
         }
 
         val items = builder.setViewTypeCount(1).build()
         views.setRemoteAdapter(R.id.lesson_list, items)
 
-        if (activeLesson.status == LessonStatus.ONGOING || activeLesson.status == LessonStatus.WAITING) {
-            val activeIndex = lessons.indexOf(activeLesson.lesson)
-            views.setScrollPosition(R.id.lesson_list, activeIndex)
+        activeIndex?.let {
+            views.setScrollPosition(R.id.lesson_list, it)
         }
     }
 
-    private fun buildListItem(context: Context, lesson: Lesson, number: Int, selected: Boolean): RemoteViews {
-        val start = lesson.start.formatTime()
-        val end = lesson.end.formatTime()
-
+    private fun buildListItem(context: Context, lesson: Lesson, status: LessonStatus): RemoteViews {
         val views = RemoteViews(context.packageName, R.layout.lesson_item)
-        views.setTextViewText(R.id.number_text, number.toString())      
-        views.setTextViewText(R.id.time_text, "$start - $end")
+        val timeText = "${lesson.start.formatTime()} - ${lesson.end.formatTime()}"
+        views.setTextViewText(R.id.time_text, timeText)  
         views.setTextViewText(R.id.subject_text, lesson.subject)
 
+
         val colors = ColorsProvider(context)
-        val textColor = if (selected) colors.selectedItemText else colors.itemText
-        val bgColor = if (selected) colors.selectedItemBackground else colors.itemBackground
-       
-        if (lesson.end < LocalDateTime.now()) {
-            val textColor2 = colors.completedItemText
-            val bgColor2 = colors.completedItemBackground
-
-            views.setInt(R.id.item_container, "setBackgroundColor", bgColor2)
-            views.setInt(R.id.number_text, "setTextColor", textColor2)
-            views.setInt(R.id.time_text, "setTextColor", textColor2)
-            views.setInt(R.id.subject_text, "setTextColor", textColor2)
-
-            return views
+        val textColor = when (status) {
+            LessonStatus.PLANNED -> colors.colorOnSurface
+            LessonStatus.ACTIVE -> colors.colorOnTertiaryContainer
+            LessonStatus.COMPLETED -> colors.colorOnSurface
+        }
+        val background = when (status) {
+            LessonStatus.PLANNED -> R.drawable.planned_background
+            LessonStatus.ACTIVE -> R.drawable.active_background
+            LessonStatus.COMPLETED -> R.drawable.completed_background
         }
 
-        views.setInt(R.id.item_container, "setBackgroundColor", bgColor)
-        views.setInt(R.id.number_text, "setTextColor", textColor)
+        views.setImageViewResource(R.id.background_image, background)
         views.setInt(R.id.time_text, "setTextColor", textColor)
         views.setInt(R.id.subject_text, "setTextColor", textColor)
 

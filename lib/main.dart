@@ -152,10 +152,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _addLessonAuto() async {
     setState(() {
       final now = TimeOfDay.now();
-      final startTime = TimeOfDay(hour: now.hour + Random().nextInt(3) + 1, minute: 0);
-      final endTime = TimeOfDay(hour: startTime.hour, minute: 30);
+      final startTime = TimeOfDay(hour: now.hour + Random().nextInt(6) - 2, minute: 0);
+      final endTime = TimeOfDay(hour: startTime.hour, minute: 45);
       final subject = String.fromCharCodes(
-        List.generate(5, (index) => 65 + Random().nextInt(26)), // Генерируем случайный предмет
+        List.generate(10, (index) => 65 + Random().nextInt(26)), // Генерируем случайный предмет
       );
       lessons.add(Lesson(start: startTime, end: endTime, subject: subject));
       lessons.sort((a, b) => a.start.compareTo(b.start));
