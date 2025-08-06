@@ -8,7 +8,7 @@
     android:orientation="vertical"
     android:clipToOutline="true"
     android:theme="@style/Theme.Material3.DynamicColors.DayNight"
-    android:background="@drawable/rounded_background">
+    android:background="@drawable/widget_background">
     <TextView
         android:id="@+id/empty_text"
         android:layout_width="match_parent"
@@ -32,14 +32,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="start"
-            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-            android:textColor="?attr/colorOnSurfaceVariant" />
-        <TextView
-            android:id="@+id/time_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="end"
+            android:gravity="center"
             android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
             android:textColor="?attr/colorOnSurfaceVariant" />
     </LinearLayout>
@@ -49,6 +42,8 @@
         android:layout_height="match_parent"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"      
         android:scrollbars="none"
         android:divider="@null"
         android:dividerHeight="0dp"/>

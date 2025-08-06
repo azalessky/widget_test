@@ -11,9 +11,14 @@ data class Lesson(
     val end: LocalDateTime
 )
 
+data class ActiveLesson(
+    val lesson: Lesson?,
+    val status: LessonStatus,
+)
+
 enum class LessonStatus {
     UPCOMING,
-    ACTIVE,
+    ONGOING,
     WAITING,
     COMPLETED
 }
@@ -34,22 +39,20 @@ object LessonRepository {
         return lessons.filter { it.start.toLocalDate() == LocalDate.now() }
     }
 
-   fun getActiveLesson(): Pair<LessonStatus, Lesson?> {
+   fun getActiveLesson(): ActiveLesson {
         val now = LocalDateTime.now().stripSeconds()
         val todayLessons = getTodayLessons()
 
         for ((index, lesson) in todayLessons.withIndex()) {
             if (!now.isBefore(lesson.start) && now.isBefore(lesson.end)) {
-                return LessonStatus.ACTIVE to lesson
+                return ActiveLesson(lesson, LessonStatus.ONGOING)
             }
             if (now.isBefore(lesson.start)) {
-                return if (index == 0)
-                    LessonStatus.UPCOMING to lesson
-                else
-                    LessonStatus.WAITING to lesson
+                val status = if (index == 0) LessonStatus.UPCOMING else LessonStatus.WAITING
+                return ActiveLesson(lesson, status)
             }
         }
-        return LessonStatus.COMPLETED to null
+        return ActiveLesson(null, LessonStatus.COMPLETED)
     }
 }
 
@@ -72,28 +75,12 @@ object LessonParser {
     }
 }
 
-fun formatStatusText(status: LessonStatus, lesson: Lesson?): Pair<String, String?> {
-    val statusText: String
-    val timeText: String?
-
-    when (status) {
-        LessonStatus.UPCOMING -> {
-            statusText = "Начало уроков"
-            timeText = lesson?.start?.formatTimeLeft(60)
-        }
-        LessonStatus.ACTIVE -> {
-            statusText = "Идёт урок"
-            timeText = lesson?.end?.formatTimeLeft()
-        }
-        LessonStatus.WAITING -> {
-            statusText = "Следующий урок"
-            timeText = lesson?.start?.formatTimeLeft(60)
-        }
-        LessonStatus.COMPLETED -> {
-            statusText = "Уроки закончены"
-            timeText = null
-        }
+fun ActiveLesson.getStatusText(): String {
+    val (statusText, timeText) = when (status) {
+        LessonStatus.UPCOMING -> "Начало уроков" to lesson?.start?.formatTimeLeft(60)
+        LessonStatus.ONGOING -> "Идёт урок" to lesson?.end?.formatTimeLeft()
+        LessonStatus.WAITING -> "Следующий урок" to lesson?.start?.formatTimeLeft(60)
+        LessonStatus.COMPLETED -> "Уроки закончены" to null
     }
-
-    return statusText to timeText
+    return if (timeText != null) "$statusText • $timeText" else statusText
 }

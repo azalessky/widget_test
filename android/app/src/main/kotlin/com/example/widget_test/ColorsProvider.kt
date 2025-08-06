@@ -27,8 +27,15 @@ class ColorsProvider(context: Context) {
         get() = getColorFromAttr(MaterialR.attr.colorSurface)
 
     val selectedItemText: Int
-        get() = getColorFromAttr(MaterialR.attr.colorOnSecondaryContainer)
+        get() = getColorFromAttr(MaterialR.attr.colorOnTertiaryContainer)
 
     val selectedItemBackground: Int
-        get() = getColorFromAttr(MaterialR.attr.colorSecondaryContainer)
+        get() = getColorFromAttr(MaterialR.attr.colorTertiaryContainer)
+
+    val completedItemText: Int
+        get() = getColorFromAttr(MaterialR.attr.colorOnSurfaceVariant)
+
+    val completedItemBackground: Int
+        get() = getColorFromAttr(MaterialR.attr.colorSurfaceVariant)
+
 }
